@@ -102,7 +102,7 @@ static int main_work(struct worker *worker)
         if(system(cmd))
             goto err_out;
 
-        snprintf(path, PATH_MAX, "%s/%d/merged/n_shblk_rd.dat", worker->id, fx_opt->root);
+        snprintf(path, PATH_MAX, "%s/%d/merged/n_shblk_rd.dat", fx_opt->root, worker->id);
         if ((fd = open(path, O_RDONLY, S_IRUSR)) == -1)
                 goto err_out;
 
