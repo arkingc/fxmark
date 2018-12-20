@@ -85,7 +85,6 @@ static int main_work(struct worker *worker)
         char *page=worker->page;
         int fd, rc = 0;
         uint64_t iter = 0;
-        char file[PATH_MAX];
         struct fx_opt *fx_opt = fx_opt_worker(worker);
 
         assert(page);

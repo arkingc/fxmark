@@ -31,7 +31,7 @@ static int pre_work(struct worker *worker)
         struct bench *bench = worker->bench;
         char path[PATH_MAX];
         char *page=NULL;
-        int fd=-1, rc=-1;
+        int fd=-1, rc=0;
 
         /*Allocate aligned buffer*/
         if(posix_memalign((void **)&(worker->page), PAGE_SIZE, PAGE_SIZE))

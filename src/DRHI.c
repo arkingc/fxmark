@@ -23,7 +23,7 @@ static int pre_work(struct worker *worker)
         char path_work[PATH_MAX];
         char path_merged[PATH_MAX];
         char file[PATH_MAX];
-        int fd = -1, rc = -1;
+        int fd = -1, rc = 0;
         struct fx_opt *fx_opt = fx_opt_worker(worker);
 
         /*Allocate aligned buffer*/
@@ -48,7 +48,7 @@ static int pre_work(struct worker *worker)
 
         /* a leader takes over all pre_work() */
         if (worker->id != 0)
-                return 0;
+                goto out;
 
         //lower
         sprintf(path_lower, "%s/lower", fx_opt->root);
@@ -90,7 +90,6 @@ static int main_work(struct worker *worker)
         char *page=worker->page;
         int fd, rc = 0;
         uint64_t iter = 0;
-        char file[PATH_MAX];
         struct fx_opt *fx_opt = fx_opt_worker(worker);
 
         assert(page);
@@ -103,8 +102,8 @@ static int main_work(struct worker *worker)
         if(system(cmd))
             goto err_out;
 
-        snprintf(path, PATH_MAX, "%s/merged/n_shblk_rd.dat", fx_opt->root);
-        if ((fd = open(path, O_RDONLY, S_IRWXU)) == -1)
+        snprintf(path, PATH_MAX, "%s/%d/merged/n_shblk_rd.dat", worker->id, fx_opt->root);
+        if ((fd = open(path, O_RDONLY, S_IRUSR)) == -1)
                 goto err_out;
 
         /*set flag with O_DIRECT if necessary*/

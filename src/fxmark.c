@@ -123,6 +123,12 @@ static struct bench_desc bench_table[] = {
     {"DTLI",
      "##################",
      &truncate_l_i_ops},
+     {"DRHH",
+     "##################",
+     &read_h_h_ops},
+    {"DRHI",
+     "##################",
+     &read_h_i_ops},
 	{NULL, NULL, NULL},
 };
 
