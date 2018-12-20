@@ -3,6 +3,7 @@
 #include <linux/limits.h>
 #include "bench.h"
 
+#define TOTAL_INODES 2500000
 #define FX_OPT_MAX_PRIVATE 4
 
 struct fx_opt {
@@ -51,5 +52,18 @@ extern struct bench_operations u_file_cr_ops;
 extern struct bench_operations u_file_rm_ops;
 extern struct bench_operations u_sh_file_rm_ops;
 extern struct bench_operations u_file_tr_ops;
+
+extern struct bench_operations open_l_h_ops;
+extern struct bench_operations open_l_c_ops;
+extern struct bench_operations open_l_i_ops;
+extern struct bench_operations readdir_l_h_ops;
+extern struct bench_operations readdir_l_c_ops;
+extern struct bench_operations readdir_l_i_ops;
+extern struct bench_operations append_l_h_ops;
+extern struct bench_operations append_l_c_ops;
+extern struct bench_operations append_l_i_ops;
+extern struct bench_operations truncate_l_h_ops;
+extern struct bench_operations truncate_l_c_ops;
+extern struct bench_operations truncate_l_i_ops;
 
 #endif /* __FX_H__ */

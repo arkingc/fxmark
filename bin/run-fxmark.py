@@ -26,7 +26,7 @@ class Runner(object):
     # media path
     LOOPDEV = "/dev/loopX"
     NVMEDEV = "/dev/nvme0n1pX"
-    HDDDEV  = "/dev/sdX"
+    HDDDEV  = "/dev/sdb1"
     SSDDEV  = "/dev/sdY"
 
     # test core granularity
@@ -95,6 +95,20 @@ class Runner(object):
             # "DRBH_bg",
             # "DRBL_bg",
             # "MRDL_bg",
+
+            # add by arking
+            "MOLH",
+            "MOLC",
+            "MOLI",
+            "MRLH",
+            "MRLC",
+            "MRLI",
+            "DALH",
+            "DALC",
+            "DALI",
+            "DTLH",
+            "DTLC",
+            "DTLI",
         ]
         self.BENCH_BG_SFX   = "_bg"
 
@@ -517,7 +531,7 @@ if __name__ == "__main__":
     run_config = [
         (Runner.CORE_FINE_GRAIN,
          PerfMon.LEVEL_LOW,
-         ("mem", "*", "DWOL", "80", "directio")),
+         ("hdd", "ext4", "DTLH", "*", "bufferedio")),
         # ("mem", "tmpfs", "filebench_varmail", "32", "directio")),
         # (Runner.CORE_COARSE_GRAIN,
         #  PerfMon.LEVEL_PERF_RECORD,
