@@ -65,5 +65,7 @@ extern struct bench_operations append_l_i_ops;
 extern struct bench_operations truncate_l_h_ops;
 extern struct bench_operations truncate_l_c_ops;
 extern struct bench_operations truncate_l_i_ops;
+extern struct bench_operations read_h_h_ops;
+extern struct bench_operations read_h_i_ops;
 
 #endif /* __FX_H__ */

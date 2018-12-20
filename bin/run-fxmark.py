@@ -107,8 +107,11 @@ class Runner(object):
             "DALC",
             "DALI",
             "DTLH",
-            "DTLC",
-            "DTLI",
+            # "DTLC",
+            # "DTLI",
+            "DRHH",
+            # "DRHC",
+            "DRHI",
         ]
         self.BENCH_BG_SFX   = "_bg"
 
@@ -531,7 +534,7 @@ if __name__ == "__main__":
     run_config = [
         (Runner.CORE_FINE_GRAIN,
          PerfMon.LEVEL_LOW,
-         ("hdd", "ext4", "DTLH", "*", "bufferedio")),
+         ("hdd", "ext4", "DRHI", "*", "bufferedio")),
         # ("mem", "tmpfs", "filebench_varmail", "32", "directio")),
         # (Runner.CORE_COARSE_GRAIN,
         #  PerfMon.LEVEL_PERF_RECORD,
