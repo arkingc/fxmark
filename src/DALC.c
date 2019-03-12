@@ -25,7 +25,7 @@ static int pre_work(struct worker *worker)
     char path_merged[PATH_MAX];
 	char file[PATH_MAX];
     char cmd[PATH_MAX];
-	int fd, rc = 0;
+	int fd = -1, rc = 0;
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 
     //upper
@@ -62,13 +62,24 @@ static int pre_work(struct worker *worker)
 	if (!page)
 		goto err_out;
 
+    /* mount before return */
+    snprintf(cmd,PATH_MAX,"sudo mount -t overlay overlay -olowerdir=%s,upperdir=%s,workdir=%s %s",path_lower,path_upper,path_work,path_merged);
+    if(system(cmd))
+        goto err_out;
+	
+    /* open the test file */ 
+	snprintf(file, PATH_MAX, "%s/%d/merged/n_blk_alloc-%d.dat", 
+		 fx_opt->root, worker->id, worker->id);
+	
+    if ((fd = open(file, O_RDWR, S_IRWXU)) == -1)
+	  goto err_out;
+	
+    /*set flag with O_DIRECT if necessary*/
+	if(bench->directio && (fcntl(fd, F_SETFL, O_DIRECT)==-1))
+	  goto err_out;
 out:
-	/* mount before return */
-    if(bench->stop != 1){
-        snprintf(cmd,PATH_MAX,"sudo mount -t overlay overlay -olowerdir=%s,upperdir=%s,workdir=%s %s",path_lower,path_upper,path_work,path_merged);
-        if(system(cmd))
-            goto err_out;
-    }
+    /* put fd to worker's private */
+    worker->private[0] = (uint64_t)fd;
 	return rc;
 err_out:
 	bench->stop = 1;
@@ -81,26 +92,14 @@ static int main_work(struct worker *worker)
 {
   	char *page = worker->page;
 	struct bench *bench = worker->bench;
-	int fd, rc = 0;
+	int fd = -1, rc = 0;
 	uint64_t iter = 0;
-	char file[PATH_MAX];
-    struct fx_opt *fx_opt = fx_opt_worker(worker);
 
 	assert(page);
 
-	/* open the test file */ 
-	snprintf(file, PATH_MAX, "%s/%d/merged/n_blk_alloc-%d.dat", 
-		 fx_opt->root, worker->id, worker->id);
-	
-    if ((fd = open(file, O_RDWR, S_IRWXU)) == -1)
-	  goto err_out;
-	
-	/*set flag with O_DIRECT if necessary*/
-	if(bench->directio && (fcntl(fd, F_SETFL, O_DIRECT)==-1))
-	  goto err_out;
-    
+    fd = (int)worker->private[0];
     /* append */
-	for (iter = 0; !bench->stop; ++iter) {
+	for (iter = 0; iter < 100000 && !bench->stop; ++iter) {
 	        if (write(fd, page, PAGE_SIZE) != PAGE_SIZE)
 			goto err_out;
 	}
@@ -111,6 +110,7 @@ out:
 err_out:
 	bench->stop = 1;
 	rc = errno;
+    free(page);
 	goto out;
 }
 

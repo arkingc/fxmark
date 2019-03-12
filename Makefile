@@ -28,12 +28,23 @@ TC      = $(SRC)/MWCM.c $(SRC)/MWCL.c \
 		  $(SRC)/DWTL.c $(SRC)/MRPH.c \
 		  $(SRC)/MRPL.c $(SRC)/MOLH.c \
 		  $(SRC)/MOLC.c $(SRC)/MOLI.c \
+		  $(SRC)/MULH.c $(SRC)/MULC.c \
+		  $(SRC)/MULI.c $(SRC)/MCLH.c \
+		  $(SRC)/MCLC.c $(SRC)/MCLI.c \
 		  $(SRC)/MRLH.c $(SRC)/MRLC.c \
 		  $(SRC)/MRLI.c $(SRC)/DALH.c \
 		  $(SRC)/DALC.c $(SRC)/DALI.c \
 		  $(SRC)/DTLH.c $(SRC)/DTLC.c \
 		  $(SRC)/DTLI.c $(SRC)/DRHH.c \
-		  $(SRC)/DRHI.c
+		  $(SRC)/DRHI.c $(SRC)/MOLCDM.c \
+		  $(SRC)/MOLIDM.c $(SRC)/MCLCDM.c \
+		  $(SRC)/MCLIDM.c $(SRC)/MULCDM.c \
+		  $(SRC)/MULIDM.c $(SRC)/MRLCDM.c \
+		  $(SRC)/MRLIDM.c $(SRC)/DRLCDM.c \
+		  $(SRC)/DRLIDM.c $(SRC)/DWLCDM.c \
+		  $(SRC)/DWLIDM.c $(SRC)/DALCDM.c \
+		  $(SRC)/DALIDM.c $(SRC)/DTLCDM.c \
+		  $(SRC)/DTLIDM.c
 DEPS	= $(wildcard $(SRC)/*.h) $(LIBS) $(TC)
 BINS	= $(BIN)/fxmark
 CPUPOLS = $(SRC)/cpuinfo $(SRC)/cpupol.h $(BIN)/cpupol.py

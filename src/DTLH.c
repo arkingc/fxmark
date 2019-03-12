@@ -24,7 +24,7 @@ static int pre_work(struct worker *worker)
     char path_work[PATH_MAX];
     char path_merged[PATH_MAX];
 	char file[PATH_MAX];
-	int fd, rc = 0;
+	int fd = -1, rc = 0;
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 
     //upper
@@ -59,20 +59,26 @@ static int pre_work(struct worker *worker)
 	if ((fd = open(file, O_CREAT | O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
 	  goto err_out;
 	
-    for(;;++worker->private[0]) {
+	/*set flag with O_DIRECT if necessary*/
+	if(bench->directio && (fcntl(fd, F_SETFL, O_DIRECT)==-1))
+	  goto err_out;
+    
+    for(;worker->private[0] < 100000;++worker->private[0]) {
       rc = write(fd, page, PAGE_SIZE);
       if (rc != PAGE_SIZE) {
         if (errno == ENOSPC) {
           --worker->private[0];
-          rc = 0;
-          goto out;
+          break;
+          //goto out;
         }
         goto err_out;
       }
     }
     
-    close(fd);
+    rc = 0;
 out:
+    /* put fd to worker's private */
+    worker->private[1] = (uint64_t)fd;
     free(page);
     worker->page = NULL;
 	return rc;
@@ -85,22 +91,10 @@ err_out:
 static int main_work(struct worker *worker)
 {
 	struct bench *bench = worker->bench;
-	int fd, rc = 0;
-	uint64_t iter = 0;
-	char file[PATH_MAX];
-    struct fx_opt *fx_opt = fx_opt_worker(worker);
+	int fd = -1, rc = 0;
+	uint64_t iter;
 
-	/* open the test file */ 
-	snprintf(file, PATH_MAX, "%s/%d/upper/u_file_tr-%d.dat", 
-		 fx_opt->root, worker->id, worker->id);
-	
-    if ((fd = open(file, O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
-	  goto err_out;
-	
-	/*set flag with O_DIRECT if necessary*/
-	if(bench->directio && (fcntl(fd, F_SETFL, O_DIRECT)==-1))
-	  goto err_out;
-    
+    fd = (int)worker->private[1];
     for (iter = --worker->private[0]; iter > 0 && !bench->stop; --iter) {
       if (ftruncate(fd, iter * PAGE_SIZE) == -1) {
         rc = errno;

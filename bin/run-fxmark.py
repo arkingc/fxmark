@@ -100,6 +100,12 @@ class Runner(object):
             "MOLH",
             "MOLC",
             "MOLI",
+            "MCLH",
+            "MCLC",
+            "MCLI",
+            "MULH",
+            "MULC",
+            "MULI",
             "MRLH",
             "MRLC",
             "MRLI",
@@ -107,12 +113,49 @@ class Runner(object):
             "DALC",
             "DALI",
             "DTLH",
-            # "DTLC",
-            # "DTLI",
+            "DTLC",
+            "DTLI",
             "DRHH",
             # "DRHC",
             "DRHI",
+            # for device mapper
+            "MOLCDM",
+            "MOLIDM",
+            "MCLCDM",
+            "MCLIDM",
+            "MULCDM",
+            "MULIDM",
+            "MRLCDM",
+            "MRLIDM",
+            "DRLCDM",
+            "DRLIDM",
+            "DWLCDM",
+            "DWLIDM",
+            "DALCDM",
+            "DALIDM",
+            "DTLCDM",
+            "DTLIDM",
         ]
+        self.BENCH_BG_SFX   = "_bg"
+
+        # path config
+        self.ROOT_NAME      = "root"
+        self.LOGD_NAME      = "../logs"
+        self.FXMARK_NAME    = "fxmark"
+        self.FILEBENCH_NAME = "run-filebench.py"
+        self.DBENCH_NAME    = "run-dbench.py"
+        self.PERFMN_NAME    = "perfmon.py"
+
+        # fs config
+        self.HOWTO_MOUNT = {
+            "tmpfs":self.mount_tmpfs,
+            "ext2":self.mount_anyfs,
+            "ext3":self.mount_anyfs,
+            "ext4":self.mount_anyfs,
+            "ext4_no_jnl":self.mount_ext4_no_jnl,
+            "xfs":self.mount_anyfs,
+            "btrfs":self.mount_anyfs,
+        }
         self.BENCH_BG_SFX   = "_bg"
 
         # path config
@@ -359,6 +402,84 @@ class Runner(object):
             return False
         return True
 
+    def mount_dm(self,mnt_path):
+        p = self.exec_cmd("sudo dd if=/dev/zero of=" + mnt_path + "/data.img bs=1 count=1 seek=20G")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo dd if=/dev/zero of=" + mnt_path + "/meta.data.img bs=1 count=1 seek=2G")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo losetup /dev/loop6 " + mnt_path + "/data.img")
+        if p.returncode is not 0:
+            return False
+        
+        p = self.exec_cmd("sudo losetup /dev/loop7 " + mnt_path + "/meta.data.img")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo dmsetup create hchen-thin-pool --table \"0 41943040 thin-pool /dev/loop7 /dev/loop6 128 65536 1 skip_block_zeroing\"")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo dmsetup message /dev/mapper/hchen-thin-pool 0 \"create_thin 0\"")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo dmsetup create hchen-thin-volumn-001 --table \"0 41943040 thin /dev/mapper/hchen-thin-pool 0\"")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo mkfs.ext4 /dev/mapper/hchen-thin-volumn-001")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo mkdir -p " + mnt_path + "/dm")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo mount /dev/mapper/hchen-thin-volumn-001 " + mnt_path + "/dm")
+        if p.returncode is not 0:
+            return False
+
+        return True
+
+    def umount_dm(self,mnt_path):
+        p = self.exec_cmd("sudo umount " + mnt_path + "/dm")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo dmsetup remove hchen-thin-volumn-001")
+        if p.returncode is not 0:
+            return False
+        
+        p = self.exec_cmd("sudo dmsetup remove hchen-thin-pool")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo losetup -d /dev/loop6")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo losetup -d /dev/loop7")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo rmdir " + mnt_path + "/dm")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo rm " + mnt_path + "/data.img")
+        if p.returncode is not 0:
+            return False
+
+        p = self.exec_cmd("sudo rm " + mnt_path + "/meta.data.img")
+        if p.returncode is not 0:
+            return False
+
+        return True
+
     def mount_ext4_no_jnl(self, media, fs, mnt_path):
         (rc, dev_path) = self.init_media(media)
         if not rc:
@@ -483,10 +604,16 @@ class Runner(object):
                 if not self.mount(media, fs, self.test_root):
                     self.log("# Fail to mount %s on %s." % (fs, media))
                     continue
+                #if not self.mount_dm(self.test_root):
+                #    self.log("# Fail to init device-mapper device.")
+                #    continue
                 self.log("## %s:%s:%s:%s:%s" % (media, fs, bench, nfg, dio))
                 self.pre_work()
                 self.fxmark(media, fs, bench, ncore, nfg, nbg, dio)
                 self.post_work()
+                #if not self.umount_dm(self.test_root):
+                #    self.log("# Fail to free device-mapper device.")
+                #    continue
             self.log("### NUM_TEST_CONF  = %d" % (cnt + 1))
         finally:
             signal.signal(signal.SIGINT, catch_ctrl_C)
@@ -534,7 +661,7 @@ if __name__ == "__main__":
     run_config = [
         (Runner.CORE_FINE_GRAIN,
          PerfMon.LEVEL_LOW,
-         ("hdd", "ext4", "DRHI", "*", "bufferedio")),
+         ("hdd", "ext4", "MCLI", "*", "bufferedio")),
         # ("mem", "tmpfs", "filebench_varmail", "32", "directio")),
         # (Runner.CORE_COARSE_GRAIN,
         #  PerfMon.LEVEL_PERF_RECORD,

@@ -18,14 +18,13 @@
 static int pre_work(struct worker *worker)
 {
 	struct bench *bench = worker->bench;
-  	char *page = NULL;
     char path_upper[PATH_MAX];
     char path_lower[PATH_MAX];
     char path_work[PATH_MAX];
     char path_merged[PATH_MAX];
-	char file[PATH_MAX];
+    char test_path[PATH_MAX];
     char cmd[PATH_MAX];
-	int fd = -1, rc = 0;
+	int rc = 0;
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 
     //upper
@@ -46,71 +45,42 @@ static int pre_work(struct worker *worker)
     rc = mkdir_p(path_work);
     if (rc) goto err_out;
 
-	/* create a test file */ 
-	snprintf(file, PATH_MAX, "%s/%d/lower/n_blk_alloc-%d.dat", 
-		 fx_opt->root, worker->id, worker->id);
-
-	if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
-	  goto err_out;
-	
-    close(fd);
-
-    /* allocate data buffer aligned with pagesize*/
-	if(posix_memalign((void **)&(worker->page), PAGE_SIZE, PAGE_SIZE))
-	  goto err_out;
-	page = worker->page;
-	if (!page)
-		goto err_out;
+    sprintf(test_path, "%s/%d/upper/dir", fx_opt->root, worker->id);
+    rc = mkdir_p(test_path);
+    if (rc) goto err_out;
 
     /* mount before return */
     snprintf(cmd,PATH_MAX,"sudo mount -t overlay overlay -olowerdir=%s,upperdir=%s,workdir=%s %s",path_lower,path_upper,path_work,path_merged);
     if(system(cmd))
         goto err_out;
-	
-    /* open the test file */ 
-	snprintf(file, PATH_MAX, "%s/%d/merged/n_blk_alloc-%d.dat", 
-		 fx_opt->root, worker->id, worker->id);
-	
-    if ((fd = open(file, O_RDWR, S_IRWXU)) == -1)
-	  goto err_out;
-	
-    /*set flag with O_DIRECT if necessary*/
-	if(bench->directio && (fcntl(fd, F_SETFL, O_DIRECT)==-1))
-	  goto err_out;
 out:
-    /* put fd to worker's private */
-    worker->private[0] = (uint64_t)fd;
 	return rc;
 err_out:
 	bench->stop = 1;
 	rc = errno;
-	free(page);
 	goto out;
 }
 
 static int main_work(struct worker *worker)
 {
-  	char *page = worker->page;
 	struct bench *bench = worker->bench;
-	int fd = -1, rc = 0;
+	int fd, rc = 0;
 	uint64_t iter = 0;
+    struct fx_opt *fx_opt = fx_opt_worker(worker);
 
-	assert(page);
-
-    fd = (int)worker->private[0];
-    /* append */
-	for (iter = 0; iter < 100000 && !bench->stop; ++iter) {
-	        if (write(fd, page, PAGE_SIZE) != PAGE_SIZE)
-			goto err_out;
+	for (iter = 0; !bench->stop; ++iter) {
+        char file[PATH_MAX];
+	    sprintf(file, "%s/%d/merged/dir/n-%" PRIu64 ".dat", fx_opt->root,worker->id,iter);
+	    if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
+            goto err_out;
+        close(fd);
 	}
 out:
-	close(fd);
 	worker->works = (double)iter;
 	return rc;
 err_out:
 	bench->stop = 1;
 	rc = errno;
-    free(page);
 	goto out;
 }
 
@@ -131,7 +101,7 @@ err_out:
     goto out;
 }
 
-struct bench_operations append_l_i_ops = {
+struct bench_operations create_l_c_ops = {
 	.pre_work  = pre_work, 
 	.main_work = main_work,
     .post_work = post_work,
