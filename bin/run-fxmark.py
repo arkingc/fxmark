@@ -141,6 +141,8 @@ class Runner(object):
             "MOLIBT",
             "MCLCBT",
             "MCLIBT",
+            "MULCBT",
+            "MULIBT",
         ]
         self.BENCH_BG_SFX   = "_bg"
 

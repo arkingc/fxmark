@@ -19,7 +19,6 @@ static int pre_work(struct worker *worker)
 {
     struct bench *bench = worker->bench;
     char path[PATH_MAX];
-    char file[PATH_MAX];
     int rc = 0;
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 

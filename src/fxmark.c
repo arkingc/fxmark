@@ -207,6 +207,12 @@ static struct bench_desc bench_table[] = {
     {"MCLIBT",
      "##################",
      &create_l_i_bt_ops},
+    {"MULCBT",
+     "##################",
+     &unlink_l_c_bt_ops},
+    {"MULIBT",
+     "##################",
+     &unlink_l_i_bt_ops},
 	{NULL, NULL, NULL},
 };
 

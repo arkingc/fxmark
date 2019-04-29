@@ -98,5 +98,7 @@ extern struct bench_operations open_l_c_bt_ops;
 extern struct bench_operations open_l_i_bt_ops;
 extern struct bench_operations create_l_c_bt_ops;
 extern struct bench_operations create_l_i_bt_ops;
+extern struct bench_operations unlink_l_c_bt_ops;
+extern struct bench_operations unlink_l_i_bt_ops;
 
 #endif /* __FX_H__ */
