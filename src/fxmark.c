@@ -219,6 +219,12 @@ static struct bench_desc bench_table[] = {
     {"MRLIBT",
      "##################",
      &readdir_l_i_bt_ops},
+    {"DRLCBT",
+     "##################",
+     &read_l_c_bt_ops},
+    {"DRLIBT",
+     "##################",
+     &read_l_i_bt_ops},
 	{NULL, NULL, NULL},
 };
 

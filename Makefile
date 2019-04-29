@@ -48,7 +48,8 @@ TC      = $(SRC)/MWCM.c $(SRC)/MWCL.c \
 		  $(SRC)/MOLIBT.c $(SRC)/MCLCBT.c \
 		  $(SRC)/MCLIBT.c $(SRC)/MULCBT.c \
 		  $(SRC)/MULIBT.c $(SRC)/MRLCBT.c \
-		  $(SRC)/MRLIBT.c
+		  $(SRC)/MRLIBT.c $(SRC)/DRLCBT.c \
+		  $(SRC)/DRLIBT.c
 DEPS	= $(wildcard $(SRC)/*.h) $(LIBS) $(TC)
 BINS	= $(BIN)/fxmark
 CPUPOLS = $(SRC)/cpuinfo $(SRC)/cpupol.h $(BIN)/cpupol.py
