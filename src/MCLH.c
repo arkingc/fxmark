@@ -17,36 +17,14 @@
 
 static int pre_work(struct worker *worker)
 {
-	struct bench *bench = worker->bench;
-    char path_upper[PATH_MAX];
-    char path_lower[PATH_MAX];
-    char path_work[PATH_MAX];
-    char path_merged[PATH_MAX];
-    char test_path[PATH_MAX];
-    //char cmd[PATH_MAX];
-	int rc = 0;
+    struct bench *bench = worker->bench;
+    char path[PATH_MAX];
+    char file[PATH_MAX];
+    int rc = 0;
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 
-    //upper
-    sprintf(path_upper, "%s/%d/upper", fx_opt->root, worker->id);
-    rc = mkdir_p(path_upper);
-    if (rc) goto err_out;
-
-    //lower
-    sprintf(path_lower, "%s/%d/lower", fx_opt->root, worker->id);
-    rc = mkdir_p(path_lower);
-    if (rc) goto err_out;
-
-    //merged, work
-    sprintf(path_merged, "%s/%d/merged", fx_opt->root, worker->id);
-    rc = mkdir_p(path_merged);
-    if (rc) goto err_out;
-    sprintf(path_work, "%s/%d/work", fx_opt->root, worker->id);
-    rc = mkdir_p(path_work);
-    if (rc) goto err_out;
-
-    sprintf(test_path, "%s/%d/upper/dir", fx_opt->root, worker->id);
-    rc = mkdir_p(test_path);
+    sprintf(path, "%s/%d/dir", fx_opt->root, worker->id);
+    rc = mkdir_p(path);
     if (rc) goto err_out;
 out:
 	return rc;
@@ -65,7 +43,7 @@ static int main_work(struct worker *worker)
 
 	for (iter = 0; !bench->stop; ++iter) {
         char file[PATH_MAX];
-	    sprintf(file, "%s/%d/upper/dir/n-%" PRIu64 ".dat", fx_opt->root,worker->id,iter);
+	    sprintf(file, "%s/%d/dir/n-%" PRIu64 ".dat", fx_opt->root,worker->id,iter);
 	    if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
             goto err_out;
         close(fd);
