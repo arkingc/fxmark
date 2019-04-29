@@ -195,6 +195,12 @@ static struct bench_desc bench_table[] = {
     {"DTLIDM",
      "##################",
      &truncate_l_i_dm_ops},
+    {"MOLCBT",
+     "##################",
+     &open_l_c_bt_ops},
+    {"MOLIBT",
+     "##################",
+     &open_l_i_bt_ops},
 	{NULL, NULL, NULL},
 };
 

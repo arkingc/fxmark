@@ -135,6 +135,10 @@ class Runner(object):
             "DALIDM",
             "DTLCDM",
             "DTLIDM",
+
+            # for btrfs
+            "MOLCBT",
+            "MOLIBT",
         ]
         self.BENCH_BG_SFX   = "_bg"
 
@@ -154,27 +158,7 @@ class Runner(object):
             "ext4":self.mount_anyfs,
             "ext4_no_jnl":self.mount_ext4_no_jnl,
             "xfs":self.mount_anyfs,
-            "btrfs":self.mount_anyfs,
-        }
-        self.BENCH_BG_SFX   = "_bg"
-
-        # path config
-        self.ROOT_NAME      = "root"
-        self.LOGD_NAME      = "../logs"
-        self.FXMARK_NAME    = "fxmark"
-        self.FILEBENCH_NAME = "run-filebench.py"
-        self.DBENCH_NAME    = "run-dbench.py"
-        self.PERFMN_NAME    = "perfmon.py"
-
-        # fs config
-        self.HOWTO_MOUNT = {
-            "tmpfs":self.mount_tmpfs,
-            "ext2":self.mount_anyfs,
-            "ext3":self.mount_anyfs,
-            "ext4":self.mount_anyfs,
-            "ext4_no_jnl":self.mount_ext4_no_jnl,
-            "xfs":self.mount_anyfs,
-            "btrfs":self.mount_anyfs,
+            "btrfs":self.mount_btrfs,
             "f2fs":self.mount_anyfs,
             "jfs":self.mount_anyfs,
             "reiserfs":self.mount_anyfs,
@@ -402,6 +386,32 @@ class Runner(object):
             return False
         return True
 
+    def mount_btrfs(self, media, fs, mnt_path):
+        (rc, dev_path) = self.init_media(media)
+        if not rc:
+            return False
+
+        p = self.exec_cmd("sudo mkfs." + fs
+                          + " " + self.HOWTO_MKFS.get(fs, "")
+                          + " " + dev_path,
+                          self.dev_null)
+        if p.returncode is not 0:
+            return False
+        p = self.exec_cmd(' '.join(["sudo mount -t", fs,
+                                    dev_path, mnt_path]),
+                          self.dev_null)
+        if p.returncode is not 0:
+            return False
+        p = self.exec_cmd("sudo chmod 777 " + mnt_path,
+                          self.dev_null)
+        if p.returncode is not 0:
+            return False
+        p = self.exec_cmd("sudo btrfs subvolume create " + mnt_path
+                          + "/subv")
+        if p.returncode is not 0:
+            return False
+        return True
+    
     def mount_dm(self,mnt_path):
         p = self.exec_cmd("sudo dd if=/dev/zero of=" + mnt_path + "/data.img bs=1 count=1 seek=20G")
         if p.returncode is not 0:
@@ -514,7 +524,7 @@ class Runner(object):
         self.umount(mnt_path)
         self.exec_cmd("mkdir -p " + mnt_path, self.dev_null)
         return mount_fn(media, fs, mnt_path)
-
+    
     def _match_config(self, key1, key2):
         for (k1, k2) in zip(key1, key2):
             if k1 == "*" or k2 == "*":
@@ -661,7 +671,7 @@ if __name__ == "__main__":
     run_config = [
         (Runner.CORE_FINE_GRAIN,
          PerfMon.LEVEL_LOW,
-         ("hdd", "ext4", "MCLI", "*", "bufferedio")),
+         ("hdd", "btrfs", "MOLIBT", "*", "bufferedio")),
         # ("mem", "tmpfs", "filebench_varmail", "32", "directio")),
         # (Runner.CORE_COARSE_GRAIN,
         #  PerfMon.LEVEL_PERF_RECORD,

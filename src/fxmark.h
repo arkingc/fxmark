@@ -93,4 +93,8 @@ extern struct bench_operations append_l_i_dm_ops;
 extern struct bench_operations truncate_l_c_dm_ops;
 extern struct bench_operations truncate_l_i_dm_ops;
 
+//for btrfs
+extern struct bench_operations open_l_c_bt_ops;
+extern struct bench_operations open_l_i_bt_ops;
+
 #endif /* __FX_H__ */
