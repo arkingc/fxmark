@@ -20,6 +20,7 @@ static int pre_work(struct worker *worker)
 	struct bench *bench = worker->bench;
     char path[PATH_MAX];
 	char file[PATH_MAX];
+	char cmd[PATH_MAX];
 	int fd = -1, rc = 0;
     int ncpu = bench->ncpu;
     int total = TOTAL_INODES / ncpu / 2;
