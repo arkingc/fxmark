@@ -29,8 +29,8 @@ static int pre_work(struct worker *worker)
     if(system(cmd))
         goto err_out;
 
-    sprintf(path_upper, "%s/%d/dir", fx_opt->root, worker->id);
-    rc = mkdir_p(path_upper);
+    sprintf(path, "%s/%d/dir", fx_opt->root, worker->id);
+    rc = mkdir_p(path);
     if (rc) goto err_out;
 
 	/* create files at the private directory */

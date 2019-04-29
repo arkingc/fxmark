@@ -24,8 +24,8 @@ static int pre_work(struct worker *worker)
     int total = TOTAL_INODES / ncpu;
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 
-    sprintf(path_upper, "%s/%d/dir", fx_opt->root, worker->id);
-    rc = mkdir_p(path_upper);
+    sprintf(path, "%s/%d/dir", fx_opt->root, worker->id);
+    rc = mkdir_p(path);
     if (rc) goto err_out;
 
 	/* create files at the private directory */
