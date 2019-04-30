@@ -36,7 +36,8 @@ TC      = $(SRC)/MWCM.c $(SRC)/MWCL.c \
 		  $(SRC)/DALC.c $(SRC)/DALI.c \
 		  $(SRC)/DTLH.c $(SRC)/DTLC.c \
 		  $(SRC)/DTLI.c $(SRC)/DRHH.c \
-		  $(SRC)/DRHI.c $(SRC)/MOLCDM.c \
+		  $(SRC)/DRHI.c $(SRC)/DRLH.c \
+		  $(SRC)/DWLH.c $(SRC)/MOLCDM.c \
 		  $(SRC)/MOLIDM.c $(SRC)/MCLCDM.c \
 		  $(SRC)/MCLIDM.c $(SRC)/MULCDM.c \
 		  $(SRC)/MULIDM.c $(SRC)/MRLCDM.c \
@@ -49,7 +50,8 @@ TC      = $(SRC)/MWCM.c $(SRC)/MWCL.c \
 		  $(SRC)/MCLIBT.c $(SRC)/MULCBT.c \
 		  $(SRC)/MULIBT.c $(SRC)/MRLCBT.c \
 		  $(SRC)/MRLIBT.c $(SRC)/DRLCBT.c \
-		  $(SRC)/DRLIBT.c
+		  $(SRC)/DRLIBT.c $(SRC)/DWLCBT.c \
+		  $(SRC)/DWLIBT.c
 DEPS	= $(wildcard $(SRC)/*.h) $(LIBS) $(TC)
 BINS	= $(BIN)/fxmark
 CPUPOLS = $(SRC)/cpuinfo $(SRC)/cpupol.h $(BIN)/cpupol.py

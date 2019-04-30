@@ -118,6 +118,8 @@ class Runner(object):
             "DRHH",
             # "DRHC",
             "DRHI",
+            "DRLH",
+            "DWLH",
             # for device mapper
             "MOLCDM",
             "MOLIDM",
@@ -143,6 +145,10 @@ class Runner(object):
             "MCLIBT",
             "MULCBT",
             "MULIBT",
+            "DRLCBT",
+            "DRLIBT",
+            "DWLCBT",
+            "DWLIBT",
         ]
         self.BENCH_BG_SFX   = "_bg"
 
