@@ -111,7 +111,7 @@ err_out:
     goto out;
 }
 
-struct bench_operations write_l_c_bt_ops = {
+struct bench_operations write_l_i_bt_ops = {
         .pre_work  = pre_work,
         .main_work = main_work,
         .post_work = post_work,
