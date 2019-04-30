@@ -237,6 +237,18 @@ static struct bench_desc bench_table[] = {
     {"DWLIBT",
      "##################",
      &write_l_i_bt_ops},
+    {"DALCBT",
+     "##################",
+     &append_l_c_bt_ops},
+    {"DALIBT",
+     "##################",
+     &append_l_i_bt_ops},
+    {"DTLCBT",
+     "##################",
+     &truncate_l_c_bt_ops},
+    {"DTLIBT",
+     "##################",
+     &truncate_l_i_bt_ops},
 	{NULL, NULL, NULL},
 };
 

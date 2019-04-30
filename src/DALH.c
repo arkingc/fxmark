@@ -19,37 +19,18 @@ static int pre_work(struct worker *worker)
 {
 	struct bench *bench = worker->bench;
   	char *page = NULL;
-    char path_upper[PATH_MAX];
-    char path_lower[PATH_MAX];
-    char path_work[PATH_MAX];
-    char path_merged[PATH_MAX];
+    char path[PATH_MAX];
 	char file[PATH_MAX];
 	int fd = -1, rc = 0;
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 
-    //upper
-    sprintf(path_upper, "%s/%d/upper", fx_opt->root, worker->id);
+    sprintf(path, "%s/%d/", fx_opt->root, worker->id);
     rc = mkdir_p(path_upper);
     if (rc) goto err_out;
 
-    //lower
-    sprintf(path_lower, "%s/%d/lower", fx_opt->root, worker->id);
-    rc = mkdir_p(path_lower);
-    if (rc) goto err_out;
-
-    //merged, work
-    sprintf(path_merged, "%s/%d/merged", fx_opt->root, worker->id);
-    rc = mkdir_p(path_merged);
-    if (rc) goto err_out;
-    sprintf(path_work, "%s/%d/work", fx_opt->root, worker->id);
-    rc = mkdir_p(path_work);
-    if (rc) goto err_out;
-
 	/* create a test file */ 
-	snprintf(file, PATH_MAX, "%s/%d/upper/n_blk_alloc-%d.dat", 
-		 fx_opt->root, worker->id, worker->id);
-
-	if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
+	snprintf(file, PATH_MAX, "%s/%d/n_blk_alloc-%d.dat", fx_opt->root, worker->id, worker->id);
+	if ((fd = open(file, O_CREAT | O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
 	  goto err_out;
 	
     /*set flag with O_DIRECT if necessary*/

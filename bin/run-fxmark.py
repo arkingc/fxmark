@@ -149,6 +149,10 @@ class Runner(object):
             "DRLIBT",
             "DWLCBT",
             "DWLIBT",
+            "DALCBT",
+            "DALIBT",
+            "DTLCBT",
+            "DTLIBT",
         ]
         self.BENCH_BG_SFX   = "_bg"
 

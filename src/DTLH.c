@@ -19,30 +19,13 @@ static int pre_work(struct worker *worker)
 {
 	struct bench *bench = worker->bench;
   	char *page = NULL;
-    char path_upper[PATH_MAX];
-    char path_lower[PATH_MAX];
-    char path_work[PATH_MAX];
-    char path_merged[PATH_MAX];
+    char path[PATH_MAX];
 	char file[PATH_MAX];
 	int fd = -1, rc = 0;
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 
-    //upper
-    sprintf(path_upper, "%s/%d/upper", fx_opt->root, worker->id);
-    rc = mkdir_p(path_upper);
-    if (rc) goto err_out;
-
-    //lower
-    sprintf(path_lower, "%s/%d/lower", fx_opt->root, worker->id);
-    rc = mkdir_p(path_lower);
-    if (rc) goto err_out;
-
-    //merged, work
-    sprintf(path_merged, "%s/%d/merged", fx_opt->root, worker->id);
-    rc = mkdir_p(path_merged);
-    if (rc) goto err_out;
-    sprintf(path_work, "%s/%d/work", fx_opt->root, worker->id);
-    rc = mkdir_p(path_work);
+    sprintf(path, "%s/%d/", fx_opt->root, worker->id);
+    rc = mkdir_p(path);
     if (rc) goto err_out;
 
     /* allocate data buffer aligned with pagesize*/
@@ -53,7 +36,7 @@ static int pre_work(struct worker *worker)
 		goto err_out;
 
 	/* create a test file */ 
-	snprintf(file, PATH_MAX, "%s/%d/upper/u_file_tr-%d.dat", 
+	snprintf(file, PATH_MAX, "%s/%d/u_file_tr-%d.dat", 
 		 fx_opt->root, worker->id, worker->id);
 
 	if ((fd = open(file, O_CREAT | O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
@@ -63,7 +46,7 @@ static int pre_work(struct worker *worker)
 	if(bench->directio && (fcntl(fd, F_SETFL, O_DIRECT)==-1))
 	  goto err_out;
     
-    for(;worker->private[0] < 100000;++worker->private[0]) {
+    for(worker->private[0] = 0; worker->private[0] < 100000; ++worker->private[0]) {
       rc = write(fd, page, PAGE_SIZE);
       if (rc != PAGE_SIZE) {
         if (errno == ENOSPC) {

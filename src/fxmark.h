@@ -113,5 +113,9 @@ extern struct bench_operations read_l_c_bt_ops;
 extern struct bench_operations read_l_i_bt_ops;
 extern struct bench_operations write_l_c_bt_ops;
 extern struct bench_operations write_l_i_bt_ops;
+extern struct bench_operations append_l_c_bt_ops;
+extern struct bench_operations append_l_i_bt_ops;
+extern struct bench_operations truncate_l_c_bt_ops;
+extern struct bench_operations truncate_l_i_bt_ops;
 
 #endif /* __FX_H__ */
