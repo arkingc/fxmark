@@ -25,7 +25,7 @@ static int pre_work(struct worker *worker)
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 
     sprintf(path, "%s/%d/", fx_opt->root, worker->id);
-    rc = mkdir_p(path_upper);
+    rc = mkdir_p(path);
     if (rc) goto err_out;
 
 	/* create a test file */ 
