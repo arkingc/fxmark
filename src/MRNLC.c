@@ -14,20 +14,6 @@
 #include "fxmark.h"
 #include "util.h"
 
-static void set_test_root(struct worker *worker, char *test_root)
-{
-	struct fx_opt *fx_opt = fx_opt_worker(worker);
-	sprintf(test_root, "%s/%d", fx_opt->root, worker->id);
-}
-
-static void set_test_file(struct worker *worker, 
-			  uint64_t file_id, char *test_file)
-{
-	struct fx_opt *fx_opt = fx_opt_worker(worker);
-	sprintf(test_file, "%s/%d/n_file_rename-%" PRIu64 ".dat",
-		fx_opt->root, worker->id, file_id);
-}
-
 static int pre_work(struct worker *worker)
 {
 	char path_upper[PATH_MAX];
@@ -66,8 +52,8 @@ static int pre_work(struct worker *worker)
     if (rc) goto err_out;
 
 	/* create files at the private directory */
-	sprintf(test_path, "%s/%d/upper/dir1/n_file_rename-%" PRIu64 ".dat",
-		fx_opt->root, worker->id, file_id);
+	sprintf(test_path, "%s/%d/upper/dir1/n_file_rename",
+		fx_opt->root, worker->id);
 	if ((fd = open(path, O_CREAT | O_RDWR, S_IRWXU)) == -1)
 		goto err_out;
 	fsync(fd);
@@ -92,10 +78,10 @@ static int main_work(struct worker *worker)
 	uint64_t iter;
 	int rc = 0;
 
-	sprintf(old_path, "%s/%d/merged/dir1/n_file_rename-%" PRIu64 ".dat",
-		fx_opt->root, worker->id, file_id);
-	sprintf(new_path, "%s/%d/merged/dir2/n_file_rename-%" PRIu64 ".dat",
-		fx_opt->root, worker->id, file_id);
+	sprintf(old_path, "%s/%d/merged/dir1/n_file_rename",
+		fx_opt->root, worker->id);
+	sprintf(new_path, "%s/%d/merged/dir2/n_file_rename",
+		fx_opt->root, worker->id);
 	for (iter = 0; !bench->stop; ++iter) {
 		if(iter % 2 == 0)
 			rc = rename(old_path, new_path);
