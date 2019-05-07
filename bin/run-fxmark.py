@@ -97,6 +97,7 @@ class Runner(object):
             # "MRDL_bg",
 
             # add by arking
+            "MRNLC",
             "MOLH",
             "MOLC",
             "MOLI",
