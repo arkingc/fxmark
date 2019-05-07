@@ -11,6 +11,7 @@
 #include <errno.h>
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
+#include <stdlib.h>
 #include "fxmark.h"
 #include "util.h"
 
@@ -54,7 +55,7 @@ static int pre_work(struct worker *worker)
 	/* create files at the private directory */
 	sprintf(test_path, "%s/%d/upper/dir1/n_file_rename",
 		fx_opt->root, worker->id);
-	if ((fd = open(path, O_CREAT | O_RDWR, S_IRWXU)) == -1)
+	if ((fd = open(test_path, O_CREAT | O_RDWR, S_IRWXU)) == -1)
 		goto err_out;
 	fsync(fd);
 	close(fd);
@@ -77,6 +78,7 @@ static int main_work(struct worker *worker)
 	char old_path[PATH_MAX], new_path[PATH_MAX];
 	uint64_t iter;
 	int rc = 0;
+	struct fx_opt *fx_opt = fx_opt_worker(worker);
 
 	sprintf(old_path, "%s/%d/merged/dir1/n_file_rename",
 		fx_opt->root, worker->id);
