@@ -22,9 +22,9 @@ static int pre_work(struct worker *worker)
     char path_lower[PATH_MAX];
     char path_work[PATH_MAX];
     char path_merged[PATH_MAX];
-    char test_path[PATH_MAX];
+    char file[PATH_MAX];
     char cmd[PATH_MAX];
-	int rc = 0;
+	int rc = 0,fd;
     int ncpu = bench->ncpu;
     int total = TOTAL_INODES / ncpu / 2;
     char *page = NULL;
@@ -94,8 +94,8 @@ static int main_work(struct worker *worker)
 
     assert(page);
 
+    char file[PATH_MAX];
 	for (iter = 0; iter < worker->private[0] && !bench->stop; ++iter) {
-        char file[PATH_MAX];
 	    sprintf(file, "%s/%d/merged/n-%" PRIu64 ".dat", fx_opt->root,worker->id,iter);
 	    if ((fd = open(file, O_RDWR, S_IRWXU)) == -1)
             goto err_out;

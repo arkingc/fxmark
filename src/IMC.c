@@ -48,7 +48,7 @@ static int pre_work(struct worker *worker)
     if (rc) goto err_out;
 
     for(;worker->private[0] < total;++worker->private[0]){
-        sprintf(test_path, "%s/%d/lower/dir%d", fx_opt->root, worker->id, worker->private[0]);
+        sprintf(test_path, "%s/%d/lower/dir%lu", fx_opt->root, worker->id, worker->private[0]);
         rc = mkdir_p(test_path);
         if (rc) goto err_out;
     }
@@ -72,9 +72,9 @@ static int main_work(struct worker *worker)
 	uint64_t iter = 0;
     struct fx_opt *fx_opt = fx_opt_worker(worker);
 
+    char file[PATH_MAX];
 	for (iter = 0; iter < worker->private[0] && !bench->stop; ++iter) {
-        char file[PATH_MAX];
-	    sprintf(file, "%s/%d/merged/dir%d/file", fx_opt->root,worker->id,iter);
+	    sprintf(file, "%s/%d/merged/dir%lu/file", fx_opt->root,worker->id,iter);
 	    if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
             goto err_out;
         close(fd);

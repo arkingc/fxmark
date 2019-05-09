@@ -95,7 +95,7 @@ static struct bench_desc bench_table[] = {
      &imu_ops},
     {"IMC",
      "##################",
-     &IMC_ops},
+     &imc_ops},
     {"IDW",
      "##################",
      &idw_ops},
