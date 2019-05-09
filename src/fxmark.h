@@ -74,7 +74,11 @@ extern struct bench_operations truncate_l_i_ops;
 extern struct bench_operations read_h_h_ops;
 extern struct bench_operations read_h_i_ops;
 
-extern struct bench_operations rename_l_c_ops;
+//for evaluation
+extern struct bench_operations cmr_ops;
+extern struct bench_operations imu_ops;
+extern struct bench_operations imc_ops;
+extern struct bench_operations idw_ops;
 
 //for host (data operations)
 extern struct bench_operations read_l_h_ops;

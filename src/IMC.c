@@ -1,8 +1,7 @@
-#pragma GCC diagnostic ignored "-Wcomment"
 /**
- * Nanobenchmark: META
- *   RN. PROCESS = {rename a file name in a private directory}
- *       - TEST: concurrent update of dentry cache
+ * Nanobenchmark: ADD
+ *   BA. PROCESS = {append files at /test/$PROCESS}
+ *       - TEST: block alloc
  */	      
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -12,21 +11,25 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "fxmark.h"
 #include "util.h"
 
 static int pre_work(struct worker *worker)
 {
-	char path_upper[PATH_MAX];
+	struct bench *bench = worker->bench;
+    char path_upper[PATH_MAX];
     char path_lower[PATH_MAX];
     char path_work[PATH_MAX];
     char path_merged[PATH_MAX];
     char test_path[PATH_MAX];
     char cmd[PATH_MAX];
-	int fd, rc = 0;
-	struct fx_opt *fx_opt = fx_opt_worker(worker);
+	int rc = 0;
+    int ncpu = bench->ncpu;
+    int total = TOTAL_INODES / ncpu / 2;
+    struct fx_opt *fx_opt = fx_opt_worker(worker);
 
-	//upper
+    //upper
     sprintf(path_upper, "%s/%d/upper", fx_opt->root, worker->id);
     rc = mkdir_p(path_upper);
     if (rc) goto err_out;
@@ -44,30 +47,20 @@ static int pre_work(struct worker *worker)
     rc = mkdir_p(path_work);
     if (rc) goto err_out;
 
-    sprintf(test_path, "%s/%d/upper/dir1", fx_opt->root, worker->id);
-    rc = mkdir_p(test_path);
-    if (rc) goto err_out;
+    for(;worker->private[0] < total;++worker->private[0]){
+        sprintf(test_path, "%s/%d/lower/dir%d", fx_opt->root, worker->id, worker->private[0]);
+        rc = mkdir_p(test_path);
+        if (rc) goto err_out;
+    }
 
-    sprintf(test_path, "%s/%d/upper/dir2", fx_opt->root, worker->id);
-    rc = mkdir_p(test_path);
-    if (rc) goto err_out;
-
-	/* create files at the private directory */
-	sprintf(test_path, "%s/%d/upper/dir1/n_file_rename",
-		fx_opt->root, worker->id);
-	if ((fd = open(test_path, O_CREAT | O_RDWR, S_IRWXU)) == -1)
-		goto err_out;
-	fsync(fd);
-	close(fd);
-
-	/* mount before return */
+    /* mount before return */
     snprintf(cmd,PATH_MAX,"sudo mount -t overlay overlay -olowerdir=%s,upperdir=%s,workdir=%s %s",path_lower,path_upper,path_work,path_merged);
     if(system(cmd))
         goto err_out;
-
 out:
 	return rc;
 err_out:
+	bench->stop = 1;
 	rc = errno;
 	goto out;
 }
@@ -75,27 +68,22 @@ err_out:
 static int main_work(struct worker *worker)
 {
 	struct bench *bench = worker->bench;
-	char old_path[PATH_MAX], new_path[PATH_MAX];
-	uint64_t iter;
-	int rc = 0;
-	struct fx_opt *fx_opt = fx_opt_worker(worker);
+	int fd, rc = 0;
+	uint64_t iter = 0;
+    struct fx_opt *fx_opt = fx_opt_worker(worker);
 
-	sprintf(old_path, "%s/%d/merged/dir1/n_file_rename",
-		fx_opt->root, worker->id);
-	sprintf(new_path, "%s/%d/merged/dir2/n_file_rename",
-		fx_opt->root, worker->id);
-	for (iter = 0; !bench->stop; ++iter) {
-		if(iter % 2 == 0)
-			rc = rename(old_path, new_path);
-		else
-			rc = rename(new_path, old_path);
-		if (rc) goto err_out;
+	for (iter = 0; iter < worker->private[0] && !bench->stop; ++iter) {
+        char file[PATH_MAX];
+	    sprintf(file, "%s/%d/merged/dir%d/file", fx_opt->root,worker->id,iter);
+	    if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
+            goto err_out;
+        close(fd);
 	}
 out:
-	bench->stop = 1;
 	worker->works = (double)iter;
 	return rc;
 err_out:
+	bench->stop = 1;
 	rc = errno;
 	goto out;
 }
@@ -117,8 +105,8 @@ err_out:
     goto out;
 }
 
-struct bench_operations rename_l_c_ops = {
+struct bench_operations imc_ops = {
 	.pre_work  = pre_work, 
 	.main_work = main_work,
-	.post_work = post_work,
+    .post_work = post_work,
 };
