@@ -161,6 +161,8 @@ class Runner(object):
             # for aufs
             "MOLCAU",
             "MOLIAU",
+            "MCLCAU",
+            "MCLIAU",
         ]
         self.BENCH_BG_SFX   = "_bg"
 

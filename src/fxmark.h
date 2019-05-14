@@ -127,5 +127,7 @@ extern struct bench_operations truncate_l_i_bt_ops;
 //for aufs
 extern struct bench_operations open_l_c_au_ops;
 extern struct bench_operations open_l_i_au_ops;
+extern struct bench_operations create_l_c_au_ops;
+extern struct bench_operations create_l_i_au_ops;
 
 #endif /* __FX_H__ */
