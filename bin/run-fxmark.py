@@ -157,6 +157,10 @@ class Runner(object):
             "DALIBT",
             "DTLCBT",
             "DTLIBT",
+
+            # for aufs
+            "MOLCAU",
+            "MOLIAU",
         ]
         self.BENCH_BG_SFX   = "_bg"
 
@@ -689,7 +693,7 @@ if __name__ == "__main__":
     run_config = [
         (Runner.CORE_FINE_GRAIN,
          PerfMon.LEVEL_LOW,
-         ("hdd", "btrfs", "MOLIBT", "*", "bufferedio")),
+         ("hdd", "ext4", "MOLCAU", "*", "bufferedio")),
         # ("mem", "tmpfs", "filebench_varmail", "32", "directio")),
         # (Runner.CORE_COARSE_GRAIN,
         #  PerfMon.LEVEL_PERF_RECORD,
