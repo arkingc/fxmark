@@ -273,6 +273,18 @@ static struct bench_desc bench_table[] = {
     {"MCLIAU",
      "##################",
      &create_l_i_au_ops},
+    {"MULCAU",
+     "##################",
+     &unlink_l_c_au_ops},
+    {"MULIAU",
+     "##################",
+     &unlink_l_i_au_ops},
+    {"MRLCAU",
+     "##################",
+     &readdir_l_c_au_ops},
+    {"MRLIAU",
+     "##################",
+     &readdir_l_i_au_ops},
 	{NULL, NULL, NULL},
 };
 

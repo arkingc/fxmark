@@ -163,6 +163,10 @@ class Runner(object):
             "MOLIAU",
             "MCLCAU",
             "MCLIAU",
+            "MULCAU",
+            "MULIAU",
+            "MRLCAU",
+            "MRLIAU",
         ]
         self.BENCH_BG_SFX   = "_bg"
 
