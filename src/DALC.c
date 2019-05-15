@@ -50,7 +50,7 @@ static int pre_work(struct worker *worker)
 	snprintf(file, PATH_MAX, "%s/%d/upper/n_blk_alloc-%d.dat", 
 		 fx_opt->root, worker->id, worker->id);
 
-	if ((fd = open(file, O_CREAT | O_RDWR, S_IRWXU)) == -1)
+	if ((fd = open(file, O_CREAT | O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
 	  goto err_out;
 	
     close(fd);
@@ -71,7 +71,7 @@ static int pre_work(struct worker *worker)
 	snprintf(file, PATH_MAX, "%s/%d/merged/n_blk_alloc-%d.dat", 
 		 fx_opt->root, worker->id, worker->id);
 	
-    if ((fd = open(file, O_RDWR, S_IRWXU)) == -1)
+    if ((fd = open(file, O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
 	  goto err_out;
 	
     /*set flag with O_DIRECT if necessary*/

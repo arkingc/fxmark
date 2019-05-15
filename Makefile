@@ -59,7 +59,13 @@ TC      = $(SRC)/MWCM.c $(SRC)/MWCL.c \
 		  $(SRC)/MOLIAU.c $(SRC)/MCLCAU.c \
 		  $(SRC)/MCLIAU.c $(SRC)/MULCAU.c \
 		  $(SRC)/MULIAU.c $(SRC)/MRLCAU.c \
-		  $(SRC)/MRLIAU.c
+		  $(SRC)/MRLIAU.c $(SRC)/DRLCAU.c \
+		  $(SRC)/DRLIAU.c $(SRC)/DWLCAU.c \
+		  $(SRC)/DWLIAU.c $(SRC)/DALCAU.c \
+		  $(SRC)/DALIAU.c $(SRC)/DTLCAU.c \
+		  $(SRC)/DTLIAU.c $(SRC)/DRLC.c \
+		  $(SRC)/DRLI.c   $(SRC)/DWLC.c \
+		  $(SRC)/DWLI.c
 DEPS	= $(wildcard $(SRC)/*.h) $(LIBS) $(TC)
 BINS	= $(BIN)/fxmark
 CPUPOLS = $(SRC)/cpuinfo $(SRC)/cpupol.h $(BIN)/cpupol.py

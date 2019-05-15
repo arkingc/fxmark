@@ -21,7 +21,6 @@ static int pre_work(struct worker *worker)
   	char *page = NULL;
     char path_upper[PATH_MAX];
     char path_lower[PATH_MAX];
-    char path_work[PATH_MAX];
     char path_merged[PATH_MAX];
 	char file[PATH_MAX];
     char cmd[PATH_MAX];
@@ -38,22 +37,10 @@ static int pre_work(struct worker *worker)
     rc = mkdir_p(path_lower);
     if (rc) goto err_out;
 
-    //merged, work
+    //merged
     sprintf(path_merged, "%s/%d/merged", fx_opt->root, worker->id);
     rc = mkdir_p(path_merged);
     if (rc) goto err_out;
-    sprintf(path_work, "%s/%d/work", fx_opt->root, worker->id);
-    rc = mkdir_p(path_work);
-    if (rc) goto err_out;
-
-	/* create a test file */ 
-	snprintf(file, PATH_MAX, "%s/%d/lower/n_blk_alloc-%d.dat", 
-		 fx_opt->root, worker->id, worker->id);
-
-	if ((fd = open(file, O_CREAT | O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
-	  goto err_out;
-	
-    close(fd);
 
     /* allocate data buffer aligned with pagesize*/
 	if(posix_memalign((void **)&(worker->page), PAGE_SIZE, PAGE_SIZE))
@@ -62,13 +49,36 @@ static int pre_work(struct worker *worker)
 	if (!page)
 		goto err_out;
 
+	/* create a test file */ 
+	snprintf(file, PATH_MAX, "%s/%d/upper/u_file_tr-%d.dat", 
+		 fx_opt->root, worker->id, worker->id);
+
+	if ((fd = open(file, O_CREAT | O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
+	  goto err_out;
+    
+    for(;worker->private[0] < 100000;++worker->private[0]) {
+      rc = write(fd, page, PAGE_SIZE);
+      if (rc != PAGE_SIZE) {
+        if (errno == ENOSPC) {
+          --worker->private[0];
+          break;
+          //goto out;
+        }
+        goto err_out;
+      }
+    }
+    
+    rc = 0;
+    fsync(fd);
+    close(fd);
+	
     /* mount before return */
-    snprintf(cmd,PATH_MAX,"sudo mount -t overlay overlay -olowerdir=%s,upperdir=%s,workdir=%s %s",path_lower,path_upper,path_work,path_merged);
+    snprintf(cmd,PATH_MAX,"sudo mount -t aufs -o dirs=%s:%s=ro none %s",path_upper,path_lower,path_merged);
     if(system(cmd))
         goto err_out;
 	
     /* open the test file */ 
-	snprintf(file, PATH_MAX, "%s/%d/merged/n_blk_alloc-%d.dat", 
+	snprintf(file, PATH_MAX, "%s/%d/merged/u_file_tr-%d.dat", 
 		 fx_opt->root, worker->id, worker->id);
 	
     if ((fd = open(file, O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
@@ -79,38 +89,36 @@ static int pre_work(struct worker *worker)
 	  goto err_out;
 out:
     /* put fd to worker's private */
-    worker->private[0] = (uint64_t)fd;
+    worker->private[1] = (uint64_t)fd;
+    free(page);
+    worker->page = NULL;
 	return rc;
 err_out:
 	bench->stop = 1;
 	rc = errno;
-	free(page);
 	goto out;
 }
 
 static int main_work(struct worker *worker)
 {
-  	char *page = worker->page;
 	struct bench *bench = worker->bench;
 	int fd = -1, rc = 0;
-	uint64_t iter = 0;
-
-	assert(page);
-
-    fd = (int)worker->private[0];
-    /* append */
-	for (iter = 0; iter < 100000 && !bench->stop; ++iter) {
-	        if (write(fd, page, PAGE_SIZE) != PAGE_SIZE)
-			goto err_out;
-	}
+	uint64_t iter;
+	
+    fd = (int)worker->private[1];
+    for (iter = --worker->private[0]; iter > 0 && !bench->stop; --iter) {
+      if (ftruncate(fd, iter * PAGE_SIZE) == -1) {
+        rc = errno;
+        goto err_out;
+      }
+    }
 out:
 	close(fd);
-	worker->works = (double)iter;
+	worker->works = (double)(worker->private[0] - iter);
 	return rc;
 err_out:
 	bench->stop = 1;
 	rc = errno;
-    free(page);
 	goto out;
 }
 
@@ -131,7 +139,7 @@ err_out:
     goto out;
 }
 
-struct bench_operations append_l_i_ops = {
+struct bench_operations truncate_l_c_au_ops = {
 	.pre_work  = pre_work, 
 	.main_work = main_work,
     .post_work = post_work,

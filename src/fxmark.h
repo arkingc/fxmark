@@ -53,26 +53,10 @@ extern struct bench_operations u_file_rm_ops;
 extern struct bench_operations u_sh_file_rm_ops;
 extern struct bench_operations u_file_tr_ops;
 
-extern struct bench_operations open_l_h_ops;
-extern struct bench_operations open_l_c_ops;
-extern struct bench_operations open_l_i_ops;
-extern struct bench_operations create_l_h_ops;
-extern struct bench_operations create_l_c_ops;
-extern struct bench_operations create_l_i_ops;
-extern struct bench_operations unlink_l_h_ops;
-extern struct bench_operations unlink_l_c_ops;
-extern struct bench_operations unlink_l_i_ops;
-extern struct bench_operations readdir_l_h_ops;
-extern struct bench_operations readdir_l_c_ops;
-extern struct bench_operations readdir_l_i_ops;
-extern struct bench_operations append_l_h_ops;
-extern struct bench_operations append_l_c_ops;
-extern struct bench_operations append_l_i_ops;
-extern struct bench_operations truncate_l_h_ops;
-extern struct bench_operations truncate_l_c_ops;
-extern struct bench_operations truncate_l_i_ops;
-extern struct bench_operations read_h_h_ops;
-extern struct bench_operations read_h_i_ops;
+
+/***********************************************************
+ * added by cxm
+ ***********************************************************/
 
 //for evaluation
 extern struct bench_operations cmr_ops;
@@ -81,10 +65,38 @@ extern struct bench_operations imc_ops;
 extern struct bench_operations idw_ops;
 
 //for host (data operations)
+extern struct bench_operations open_l_h_ops;
+extern struct bench_operations create_l_h_ops;
+extern struct bench_operations unlink_l_h_ops;
+extern struct bench_operations readdir_l_h_ops;
 extern struct bench_operations read_l_h_ops;
 extern struct bench_operations write_l_h_ops;
+extern struct bench_operations append_l_h_ops;
+extern struct bench_operations truncate_l_h_ops;
 
-//for device mapper
+//for overlayfs
+extern struct bench_operations open_l_c_ops;
+extern struct bench_operations open_l_i_ops;
+extern struct bench_operations create_l_c_ops;
+extern struct bench_operations create_l_i_ops;
+extern struct bench_operations unlink_l_c_ops;
+extern struct bench_operations unlink_l_i_ops;
+extern struct bench_operations readdir_l_c_ops;
+extern struct bench_operations readdir_l_i_ops;
+
+extern struct bench_operations read_l_c_ops;
+extern struct bench_operations read_l_i_ops;
+extern struct bench_operations write_l_c_ops;
+extern struct bench_operations write_l_i_ops;
+extern struct bench_operations append_l_c_ops;
+extern struct bench_operations append_l_i_ops;
+extern struct bench_operations truncate_l_c_ops;
+extern struct bench_operations truncate_l_i_ops;
+
+extern struct bench_operations read_h_h_ops;
+extern struct bench_operations read_h_i_ops;
+
+//for device mapper              
 extern struct bench_operations open_l_c_dm_ops;
 extern struct bench_operations open_l_i_dm_ops;
 extern struct bench_operations create_l_c_dm_ops;
@@ -131,5 +143,14 @@ extern struct bench_operations unlink_l_c_au_ops;
 extern struct bench_operations unlink_l_i_au_ops;
 extern struct bench_operations readdir_l_c_au_ops;
 extern struct bench_operations readdir_l_i_au_ops;
+
+extern struct bench_operations read_l_c_au_ops;
+extern struct bench_operations read_l_i_au_ops;
+extern struct bench_operations write_l_c_au_ops;
+extern struct bench_operations write_l_i_au_ops;
+extern struct bench_operations append_l_c_au_ops;
+extern struct bench_operations append_l_i_au_ops;
+extern struct bench_operations truncate_l_c_au_ops;
+extern struct bench_operations truncate_l_i_au_ops;
 
 #endif /* __FX_H__ */

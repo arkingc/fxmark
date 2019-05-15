@@ -21,7 +21,6 @@ static int pre_work(struct worker *worker)
   	char *page = NULL;
     char path_upper[PATH_MAX];
     char path_lower[PATH_MAX];
-    char path_work[PATH_MAX];
     char path_merged[PATH_MAX];
 	char file[PATH_MAX];
     char cmd[PATH_MAX];
@@ -38,21 +37,19 @@ static int pre_work(struct worker *worker)
     rc = mkdir_p(path_lower);
     if (rc) goto err_out;
 
-    //merged, work
+    //merged
     sprintf(path_merged, "%s/%d/merged", fx_opt->root, worker->id);
     rc = mkdir_p(path_merged);
     if (rc) goto err_out;
-    sprintf(path_work, "%s/%d/work", fx_opt->root, worker->id);
-    rc = mkdir_p(path_work);
-    if (rc) goto err_out;
 
 	/* create a test file */ 
-	snprintf(file, PATH_MAX, "%s/%d/lower/n_blk_alloc-%d.dat", 
+	snprintf(file, PATH_MAX, "%s/%d/upper/n_blk_alloc-%d.dat", 
 		 fx_opt->root, worker->id, worker->id);
 
 	if ((fd = open(file, O_CREAT | O_RDWR | O_LARGEFILE, S_IRWXU)) == -1)
 	  goto err_out;
 	
+    fsync(fd);
     close(fd);
 
     /* allocate data buffer aligned with pagesize*/
@@ -63,7 +60,7 @@ static int pre_work(struct worker *worker)
 		goto err_out;
 
     /* mount before return */
-    snprintf(cmd,PATH_MAX,"sudo mount -t overlay overlay -olowerdir=%s,upperdir=%s,workdir=%s %s",path_lower,path_upper,path_work,path_merged);
+    snprintf(cmd,PATH_MAX,"sudo mount -t aufs -o dirs=%s:%s=ro none %s",path_upper,path_lower,path_merged);
     if(system(cmd))
         goto err_out;
 	
@@ -131,7 +128,7 @@ err_out:
     goto out;
 }
 
-struct bench_operations append_l_i_ops = {
+struct bench_operations append_l_c_au_ops = {
 	.pre_work  = pre_work, 
 	.main_work = main_work,
     .post_work = post_work,

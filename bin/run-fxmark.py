@@ -96,34 +96,50 @@ class Runner(object):
             # "DRBL_bg",
             # "MRDL_bg",
 
-            # add by arking
+            ################################
+            #        added by cxm          #
+            ################################
+            
+            # for evaluation
             "CMR",
             "IMU",
             "IMC",
             "IDW",
+
+            # for host
             "MOLH",
+            "MCLH",
+            "MULH",
+            "MRLH",
+            "DRLH",
+            "DWLH",
+            "DALH",
+            "DTLH",
+
+            # for overlayfs 
             "MOLC",
             "MOLI",
-            "MCLH",
             "MCLC",
             "MCLI",
-            "MULH",
             "MULC",
             "MULI",
-            "MRLH",
             "MRLC",
             "MRLI",
-            "DALH",
+            "DRLC",
+            "DRLI",
+            "DWLC",
+            "DWLI",
             "DALC",
-            "DALI",
-            "DTLH",
+            "DALI",   
             "DTLC",
-            "DTLI",
+            "DTLI",     
+
             "DRHH",
             # "DRHC",
             "DRHI",
             "DRLH",
             "DWLH",
+
             # for device mapper
             "MOLCDM",
             "MOLIDM",
@@ -167,6 +183,14 @@ class Runner(object):
             "MULIAU",
             "MRLCAU",
             "MRLIAU",
+            "DRLCAU",
+            "DRLIAU",
+            "DWLCAU",
+            "DWLIAU",
+            "DALCAU",
+            "DALIAU",
+            "DTLCAU",
+            "DTLIAU",
         ]
         self.BENCH_BG_SFX   = "_bg"
 
