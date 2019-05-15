@@ -22,7 +22,6 @@ static int pre_work(struct worker *worker)
         char path_lower[PATH_MAX];
         char path_merged[PATH_MAX];
         char cmd[PATH_MAX];
-        char path[PATH_MAX];
         char file[PATH_MAX];
         int fd = -1, rc = 0;
         struct fx_opt *fx_opt = fx_opt_worker(worker);
