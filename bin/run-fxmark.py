@@ -137,8 +137,6 @@ class Runner(object):
             "DRHH",
             # "DRHC",
             "DRHI",
-            "DRLH",
-            "DWLH",
 
             # for device mapper
             "MOLCDM",
